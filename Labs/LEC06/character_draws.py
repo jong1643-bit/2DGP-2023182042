@@ -60,8 +60,13 @@ def draw_triangle(x,y):
     update_canvas()
     delay(0.001)
 
+def move_triangle_bottom():
+   for x in range(10,701,4):
+        y=100
+        draw_triangle(x,y)
 
 
+  
 
 def move_triangle():
     move_triangle_bottom()
