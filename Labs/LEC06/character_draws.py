@@ -11,7 +11,7 @@ character = load_image('character.png')
 def move_circle():
   for degree in range(360):
    theta=math.radians(degree)
-   
+   x=400+200*math.cos(theta)
 
    clear_canvas()
    character.draw(400,300)
