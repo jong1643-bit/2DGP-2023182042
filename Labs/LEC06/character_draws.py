@@ -65,7 +65,12 @@ def move_triangle_bottom():
         y=100
         draw_triangle(x,y)
 
-
+def move_triangle_right():
+   for i in range(100):
+        t=i/100
+        x=700-300*t
+        y=100+400*t
+        draw_triangle(x,y)
   
 
 def move_triangle():
