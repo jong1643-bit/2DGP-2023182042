@@ -17,13 +17,13 @@ def move_circle():
    clear_canvas()
    character.draw(x,y)
    update_canvas()
-   delay(0.01)
+   delay(0.001)
 
 def draw_rectangle(x,y):
    clear_canvas()
    character.draw(x,y)
    update_canvas()
-   delay(0.01)
+   delay(0.001)
 
 def move_top():
    for x in range(200,601,4):
