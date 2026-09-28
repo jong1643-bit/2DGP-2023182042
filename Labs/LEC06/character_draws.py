@@ -35,6 +35,11 @@ def move_right():
       x=600
       character.draws(x,y)
 
+def move_bottom():
+    for x in range(600,199,-4):
+        y=150
+        character.draws(x,y)
+        
 
 def move_rectangle():
     move_top()
