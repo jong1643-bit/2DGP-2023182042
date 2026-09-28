@@ -30,6 +30,11 @@ def move_top():
       y=450
       character.draws(x,y)
 
+def move_right():
+   for y in range(450,149,-3):
+      x=600
+      character.draws(x,y)
+
 
 def move_rectangle():
     move_top()
