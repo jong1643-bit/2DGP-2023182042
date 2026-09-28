@@ -19,6 +19,11 @@ def move_circle():
    update_canvas()
    pass
 
+def draw_rectangle(x,y):
+   clear_canvas()
+    character.draw(x,y)
+
+
 def move_rectangle():
     move_top()
     move_right()
