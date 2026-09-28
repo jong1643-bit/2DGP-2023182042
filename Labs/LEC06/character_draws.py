@@ -25,6 +25,12 @@ def draw_rectangle(x,y):
    update_canvas()
    delay(0.01)
 
+def move_top():
+   for x in range(200,601,4):
+      y=450
+      character.draws(x,y)
+
+
 def move_rectangle():
     move_top()
     move_right()
