@@ -17,7 +17,7 @@ def move_circle():
    clear_canvas()
    character.draw(x,y)
    update_canvas()
-   pass
+   delay(0.01)
 
 def draw_rectangle(x,y):
    clear_canvas()
@@ -64,7 +64,5 @@ while True:
     move_triangle()
     pass
 
-
-delay(10)
 
 close_canvas()
