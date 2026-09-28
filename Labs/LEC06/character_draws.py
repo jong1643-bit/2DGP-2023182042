@@ -54,6 +54,15 @@ def move_rectangle():
     move_left()
     pass
 
+def draw_triangle(x,y):
+    clear_canvas()
+    character.draw(x,y)
+    update_canvas()
+    delay(0.001)
+
+
+
+
 def move_triangle():
     move_triangle_bottom()
     move_triangle_right()
