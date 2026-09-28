@@ -15,7 +15,7 @@ def move_circle():
    y=300+200*math.sin(theta)
 
    clear_canvas()
-   character.draw(400,300)
+   character.draw(x,y)
    update_canvas()
    pass
 
