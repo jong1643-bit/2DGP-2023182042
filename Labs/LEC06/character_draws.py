@@ -28,22 +28,22 @@ def draw_rectangle(x,y):
 def move_top():
    for x in range(200,601,4):
       y=450
-      character.draws(x,y)
+      draw_rectangle(x,y)
 
 def move_right():
    for y in range(450,149,-3):
       x=600
-      character.draws(x,y)
+      draw_rectangle(x,y)
 
 def move_bottom():
     for x in range(600,199,-4):
         y=150
-        character.draws(x,y)
+        draw_rectangle(x,y)
 
 def move_left():
     for y in range(150,451,3):
         x=200
-        character.draws(x,y)
+        draw_rectangle(x,y)
 
 
 
