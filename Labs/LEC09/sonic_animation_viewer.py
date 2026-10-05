@@ -1,6 +1,7 @@
 """Classic Sonic sprite animation viewer (pico2d)."""
 
 from pathlib import Path
+import sys
 
 import pico2d as p2d
 
@@ -10,7 +11,13 @@ IMAGE_PATH = Path(__file__).resolve().with_name('sonic-sprite.png')
 
 
 def load_sprite(path=IMAGE_PATH):
-    return p2d.load_image(str(path))
+    path = Path(path)
+    if not path.is_file():
+        raise FileNotFoundError(f'Sprite image not found: {path}')
+    try:
+        return p2d.load_image(str(path))
+    except (OSError, RuntimeError) as error:
+        raise OSError(f'Cannot load sprite image: {path} ({error})') from error
 
 
 def handle_events():
@@ -32,6 +39,9 @@ def main():
             p2d.clear_canvas()
             p2d.update_canvas()
             p2d.delay(0.01)
+    except (OSError, ValueError) as error:
+        print(f'Animation viewer: {error}', file=sys.stderr)
+        return 1
     finally:
         p2d.close_canvas()
     return 0
