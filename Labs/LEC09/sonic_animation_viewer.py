@@ -4,6 +4,7 @@ from pathlib import Path
 import sys
 from dataclasses import dataclass
 from math import isfinite
+from time import perf_counter
 
 import pico2d as p2d
 
@@ -86,6 +87,31 @@ ANIMATIONS = tuple(Animation(name, frames_from_boxes(boxes))
                    for name, boxes in zip(ANIMATION_NAMES, GROUP_BOXES))
 
 
+class Playback:
+    def __init__(self, animations):
+        self.animations = animations
+        self.animation_index = 0
+        self.frame_index = 0
+        self.frame_elapsed = 0.0
+
+    @property
+    def animation(self):
+        return self.animations[self.animation_index]
+
+    @property
+    def frame(self):
+        return self.animation.frames[self.frame_index]
+
+    def update(self, elapsed):
+        if not isfinite(elapsed) or elapsed < 0:
+            raise ValueError('Elapsed time must be finite and nonnegative')
+        self.frame_elapsed += elapsed
+        duration = 1.0 / self.animation.fps
+        while self.frame_elapsed + 1e-12 >= duration:
+            self.frame_elapsed = max(0.0, self.frame_elapsed - duration)
+            self.frame_index = min(self.frame_index + 1, len(self.animation.frames) - 1)
+
+
 def validate_animations(animations, image_width, image_height):
     if not animations:
         raise ValueError('Animation list is empty')
@@ -155,8 +181,13 @@ def main():
     try:
         sprite = load_sprite()
         validate_animations(ANIMATIONS, sprite.w, sprite.h)
+        playback = Playback(ANIMATIONS[:1])
+        previous_time = perf_counter()
         while handle_events():
-            draw_frame(sprite, ANIMATIONS[0].frames[0])
+            current_time = perf_counter()
+            playback.update(current_time - previous_time)
+            previous_time = current_time
+            draw_frame(sprite, playback.frame)
             p2d.delay(0.01)
     except (OSError, ValueError) as error:
         print(f'Animation viewer: {error}', file=sys.stderr)
