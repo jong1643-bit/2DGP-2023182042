@@ -109,7 +109,7 @@ class Playback:
         duration = 1.0 / self.animation.fps
         while self.frame_elapsed + 1e-12 >= duration:
             self.frame_elapsed = max(0.0, self.frame_elapsed - duration)
-            self.frame_index = min(self.frame_index + 1, len(self.animation.frames) - 1)
+            self.frame_index = (self.frame_index + 1) % len(self.animation.frames)
 
 
 def validate_animations(animations, image_width, image_height):
