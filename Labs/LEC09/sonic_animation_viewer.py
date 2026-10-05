@@ -49,7 +49,9 @@ ANIMATION_NAMES = (
 
 
 def frames_from_boxes(boxes):
-    return tuple(Frame(x, y, w, h, w / 2, h) for x, y, w, h in boxes)
+    # A shared source baseline preserves the sheet's intentional vertical motion.
+    baseline = max(y + h for x, y, w, h in boxes)
+    return tuple(Frame(x, y, w, h, w / 2, baseline - y) for x, y, w, h in boxes)
 
 
 # Measured from the 399x525 RGBA source. No uniform grid assumption.
