@@ -127,6 +127,18 @@ def handle_events():
     return True
 
 
+def clip_rectangle(frame, image_height):
+    """Convert measured top-left coordinates to pico2d bottom-left coordinates."""
+    return frame.x, image_height - frame.y - frame.height, frame.width, frame.height
+
+
+def draw_frame(sprite, frame):
+    p2d.clear_canvas()
+    sprite.clip_draw(*clip_rectangle(frame, sprite.h),
+                     WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
+    p2d.update_canvas()
+
+
 def main():
     """Application entry point."""
     p2d.open_canvas(WINDOW_WIDTH, WINDOW_HEIGHT)
@@ -134,8 +146,7 @@ def main():
         sprite = load_sprite()
         validate_animations(ANIMATIONS, sprite.w, sprite.h)
         while handle_events():
-            p2d.clear_canvas()
-            p2d.update_canvas()
+            draw_frame(sprite, ANIMATIONS[0].frames[0])
             p2d.delay(0.01)
     except (OSError, ValueError) as error:
         print(f'Animation viewer: {error}', file=sys.stderr)
