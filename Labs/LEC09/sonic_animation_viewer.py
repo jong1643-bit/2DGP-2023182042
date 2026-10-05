@@ -1,9 +1,16 @@
 """Classic Sonic sprite animation viewer (pico2d)."""
 
+from pathlib import Path
+
 import pico2d as p2d
 
 WINDOW_WIDTH = 1200
 WINDOW_HEIGHT = 800
+IMAGE_PATH = Path(__file__).resolve().with_name('sonic-sprite.png')
+
+
+def load_sprite(path=IMAGE_PATH):
+    return p2d.load_image(str(path))
 
 
 def handle_events():
@@ -20,6 +27,7 @@ def main():
     """Application entry point."""
     p2d.open_canvas(WINDOW_WIDTH, WINDOW_HEIGHT)
     try:
+        sprite = load_sprite()
         while handle_events():
             p2d.clear_canvas()
             p2d.update_canvas()
