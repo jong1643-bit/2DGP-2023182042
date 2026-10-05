@@ -3,6 +3,7 @@
 from pathlib import Path
 import sys
 from dataclasses import dataclass
+from math import isfinite
 
 import pico2d as p2d
 
@@ -81,6 +82,31 @@ ANIMATIONS = tuple(Animation(name, frames_from_boxes(boxes))
                    for name, boxes in zip(ANIMATION_NAMES, GROUP_BOXES))
 
 
+def validate_animations(animations, image_width, image_height):
+    if not animations:
+        raise ValueError('Animation list is empty')
+    names = set()
+    for animation in animations:
+        if not animation.name or animation.name in names:
+            raise ValueError(f'Invalid or duplicate animation name: {animation.name}')
+        names.add(animation.name)
+        if not isfinite(animation.fps) or animation.fps <= 0:
+            raise ValueError(f'{animation.name}: fps must be positive and finite')
+        if not animation.frames:
+            raise ValueError(f'{animation.name}: frame list is empty')
+        for index, frame in enumerate(animation.frames):
+            label = f'{animation.name}, frame {index + 1}'
+            values = (frame.x, frame.y, frame.width, frame.height)
+            if any(not isinstance(value, int) for value in values):
+                raise ValueError(f'{label}: rectangle must use integer pixels')
+            if (frame.width <= 0 or frame.height <= 0 or frame.x < 0 or frame.y < 0
+                    or frame.x + frame.width > image_width
+                    or frame.y + frame.height > image_height):
+                raise ValueError(f'{label}: rectangle outside sprite image')
+            if not all(isfinite(value) for value in (frame.anchor_x, frame.anchor_y)):
+                raise ValueError(f'{label}: anchor must be finite')
+
+
 def load_sprite(path=IMAGE_PATH):
     path = Path(path)
     if not path.is_file():
@@ -106,6 +132,7 @@ def main():
     p2d.open_canvas(WINDOW_WIDTH, WINDOW_HEIGHT)
     try:
         sprite = load_sprite()
+        validate_animations(ANIMATIONS, sprite.w, sprite.h)
         while handle_events():
             p2d.clear_canvas()
             p2d.update_canvas()
