@@ -12,10 +12,10 @@ WINDOW_WIDTH = 1200
 WINDOW_HEIGHT = 800
 IMAGE_PATH = Path(__file__).resolve().with_name('sonic-sprite.png')
 DEFAULT_FPS = 10
-DISPLAY_SCALE = 8
+DISPLAY_SCALE = 4
 REPEAT_COUNT = 5
 WAIT_SECONDS = 1.0
-# Feet at y=240 place a typical 40-pixel-tall pose around screen center.
+# Scale the foot baseline to keep a typical 40-pixel-tall pose centered.
 ANCHOR_X = WINDOW_WIDTH / 2
 ANCHOR_Y = WINDOW_HEIGHT / 2 - 20 * DISPLAY_SCALE
 
