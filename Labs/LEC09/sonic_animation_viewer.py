@@ -2,12 +2,42 @@
 
 from pathlib import Path
 import sys
+from dataclasses import dataclass
 
 import pico2d as p2d
 
 WINDOW_WIDTH = 1200
 WINDOW_HEIGHT = 800
 IMAGE_PATH = Path(__file__).resolve().with_name('sonic-sprite.png')
+DEFAULT_FPS = 10
+
+
+@dataclass(frozen=True)
+class Frame:
+    """Source rectangle and anchor, both using top-left coordinates."""
+    x: int
+    y: int
+    width: int
+    height: int
+    anchor_x: float
+    anchor_y: float
+
+
+@dataclass(frozen=True)
+class Animation:
+    name: str
+    frames: tuple[Frame, ...]
+    fps: float = DEFAULT_FPS
+
+
+# Visual groups in reading order. Names describe poses, not game mechanics.
+# Footer credit mascots and title lettering are not animation frames.
+ANIMATION_NAMES = (
+    'idle_blink', 'waiting', 'look_up', 'crouch', 'curl',
+    'walk', 'run', 'fast_run', 'dash', 'roll', 'ball', 'spin_ball',
+    'running_turn', 'spin_dash', 'turn_around', 'hurt', 'balance',
+    'surprised', 'victory',
+)
 
 
 def load_sprite(path=IMAGE_PATH):
