@@ -14,6 +14,7 @@ IMAGE_PATH = Path(__file__).resolve().with_name('sonic-sprite.png')
 DEFAULT_FPS = 10
 DISPLAY_SCALE = 8
 REPEAT_COUNT = 5
+WAIT_SECONDS = 1.0
 # Feet at y=240 place a typical 40-pixel-tall pose around screen center.
 ANCHOR_X = WINDOW_WIDTH / 2
 ANCHOR_Y = WINDOW_HEIGHT / 2 - 20 * DISPLAY_SCALE
@@ -96,6 +97,11 @@ class Playback:
         self.frame_elapsed = 0.0
         self.completed_repeats = 0
         self.state = 'PLAYING'
+        self.wait_elapsed = 0.0
+
+    @property
+    def wait_finished(self):
+        return self.state == 'WAITING' and self.wait_elapsed >= WAIT_SECONDS
 
     @property
     def animation(self):
@@ -108,7 +114,8 @@ class Playback:
     def update(self, elapsed):
         if not isfinite(elapsed) or elapsed < 0:
             raise ValueError('Elapsed time must be finite and nonnegative')
-        if self.state != 'PLAYING':
+        if self.state == 'WAITING':
+            self.wait_elapsed += elapsed
             return
         self.frame_elapsed += elapsed
         duration = 1.0 / self.animation.fps
@@ -121,6 +128,7 @@ class Playback:
                     self.frame_index = len(self.animation.frames) - 1
                     self.frame_elapsed = 0.0
                     self.state = 'WAITING'
+                    self.wait_elapsed = 0.0
                     break
 
 
