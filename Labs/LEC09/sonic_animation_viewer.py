@@ -11,6 +11,7 @@ WINDOW_WIDTH = 1200
 WINDOW_HEIGHT = 800
 IMAGE_PATH = Path(__file__).resolve().with_name('sonic-sprite.png')
 DEFAULT_FPS = 10
+DISPLAY_SCALE = 8
 
 
 @dataclass(frozen=True)
@@ -135,7 +136,8 @@ def clip_rectangle(frame, image_height):
 def draw_frame(sprite, frame):
     p2d.clear_canvas()
     sprite.clip_draw(*clip_rectangle(frame, sprite.h),
-                     WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2)
+                     WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2,
+                     frame.width * DISPLAY_SCALE, frame.height * DISPLAY_SCALE)
     p2d.update_canvas()
 
 
