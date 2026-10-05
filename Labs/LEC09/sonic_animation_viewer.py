@@ -85,8 +85,10 @@ GROUP_BOXES = (
     FRAME_ROWS[6], FRAME_ROWS[7][:6], FRAME_ROWS[7][6:], FRAME_ROWS[8],
     FRAME_ROWS[9][:2], FRAME_ROWS[9][2:],
 )
-ANIMATIONS = tuple(Animation(name, frames_from_boxes(boxes))
-                   for name, boxes in zip(ANIMATION_NAMES, GROUP_BOXES))
+# Slow poses stay readable; running and spinning use faster frame rates.
+ANIMATION_FPS = (5, 6, 4, 3, 4, 12, 14, 16, 18, 14, 6, 14, 12, 14, 10, 6, 8, 5, 6)
+ANIMATIONS = tuple(Animation(name, frames_from_boxes(boxes), fps)
+                   for name, boxes, fps in zip(ANIMATION_NAMES, GROUP_BOXES, ANIMATION_FPS))
 
 
 class Playback:
