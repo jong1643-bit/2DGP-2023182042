@@ -12,6 +12,9 @@ WINDOW_HEIGHT = 800
 IMAGE_PATH = Path(__file__).resolve().with_name('sonic-sprite.png')
 DEFAULT_FPS = 10
 DISPLAY_SCALE = 8
+# Feet at y=240 place a typical 40-pixel-tall pose around screen center.
+ANCHOR_X = WINDOW_WIDTH / 2
+ANCHOR_Y = WINDOW_HEIGHT / 2 - 20 * DISPLAY_SCALE
 
 
 @dataclass(frozen=True)
@@ -133,11 +136,16 @@ def clip_rectangle(frame, image_height):
     return frame.x, image_height - frame.y - frame.height, frame.width, frame.height
 
 
+def destination(frame):
+    width, height = frame.width * DISPLAY_SCALE, frame.height * DISPLAY_SCALE
+    x = ANCHOR_X + (frame.width / 2 - frame.anchor_x) * DISPLAY_SCALE
+    y = ANCHOR_Y + (frame.anchor_y - frame.height / 2) * DISPLAY_SCALE
+    return x, y, width, height
+
+
 def draw_frame(sprite, frame):
     p2d.clear_canvas()
-    sprite.clip_draw(*clip_rectangle(frame, sprite.h),
-                     WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2,
-                     frame.width * DISPLAY_SCALE, frame.height * DISPLAY_SCALE)
+    sprite.clip_draw(*clip_rectangle(frame, sprite.h), *destination(frame))
     p2d.update_canvas()
 
 
