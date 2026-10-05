@@ -213,7 +213,7 @@ def main():
     try:
         sprite = load_sprite()
         validate_animations(ANIMATIONS, sprite.w, sprite.h)
-        playback = Playback(ANIMATIONS[:1])
+        playback = Playback(ANIMATIONS)
         previous_time = perf_counter()
         while handle_events():
             current_time = perf_counter()
