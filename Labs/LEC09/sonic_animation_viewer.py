@@ -93,6 +93,7 @@ class Playback:
         self.animation_index = 0
         self.frame_index = 0
         self.frame_elapsed = 0.0
+        self.completed_repeats = 0
 
     @property
     def animation(self):
@@ -110,6 +111,8 @@ class Playback:
         while self.frame_elapsed + 1e-12 >= duration:
             self.frame_elapsed = max(0.0, self.frame_elapsed - duration)
             self.frame_index = (self.frame_index + 1) % len(self.animation.frames)
+            if self.frame_index == 0:
+                self.completed_repeats += 1
 
 
 def validate_animations(animations, image_width, image_height):
