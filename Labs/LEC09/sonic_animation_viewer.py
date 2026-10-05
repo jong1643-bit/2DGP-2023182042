@@ -111,11 +111,23 @@ class Playback:
     def frame(self):
         return self.animation.frames[self.frame_index]
 
+    def next_animation(self):
+        if self.animation_index + 1 >= len(self.animations):
+            return
+        self.animation_index += 1
+        self.frame_index = 0
+        self.completed_repeats = 0
+        self.frame_elapsed = 0.0
+        self.wait_elapsed = 0.0
+        self.state = 'PLAYING'
+
     def update(self, elapsed):
         if not isfinite(elapsed) or elapsed < 0:
             raise ValueError('Elapsed time must be finite and nonnegative')
         if self.state == 'WAITING':
             self.wait_elapsed += elapsed
+            if self.wait_finished:
+                self.next_animation()
             return
         self.frame_elapsed += elapsed
         duration = 1.0 / self.animation.fps
