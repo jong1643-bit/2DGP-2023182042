@@ -15,6 +15,7 @@ DEFAULT_FPS = 10
 DISPLAY_SCALE = 4
 REPEAT_COUNT = 5
 WAIT_SECONDS = 1.0
+MOTION_MARGIN = 24
 # Scale the foot baseline to keep a typical 40-pixel-tall pose centered.
 ANCHOR_X = WINDOW_WIDTH / 2
 ANCHOR_Y = WINDOW_HEIGHT / 2 - 20 * DISPLAY_SCALE
@@ -36,6 +37,7 @@ class Animation:
     name: str
     frames: tuple[Frame, ...]
     fps: float = DEFAULT_FPS
+    speed: float = 0.0  # Screen pixels/second; negative means initial recoil to the left.
 
 
 # Visual groups in reading order. Names describe poses, not game mechanics.
@@ -89,7 +91,12 @@ GROUP_BOXES = (
 )
 # Slow poses stay readable; running and spinning use faster frame rates.
 ANIMATION_FPS = (5, 6, 4, 3, 4, 12, 14, 16, 18, 14, 6, 14, 12, 14, 10, 6, 8, 5, 6)
-ANIMATIONS = tuple(Animation(name, frames_from_boxes(boxes), fps)
+MOTION_SPEEDS = {
+    'walk': 100, 'run': 220, 'fast_run': 320, 'dash': 420,
+    'roll': 240, 'spin_ball': 280, 'running_turn': 200,
+    'spin_dash': 320, 'hurt': -160,
+}
+ANIMATIONS = tuple(Animation(name, frames_from_boxes(boxes), fps, MOTION_SPEEDS.get(name, 0))
                    for name, boxes, fps in zip(ANIMATION_NAMES, GROUP_BOXES, ANIMATION_FPS))
 
 
@@ -102,6 +109,7 @@ class Playback:
         self.completed_repeats = 0
         self.state = 'PLAYING'
         self.wait_elapsed = 0.0
+        self.motion_elapsed = 0.0
 
     @property
     def wait_finished(self):
@@ -115,6 +123,20 @@ class Playback:
     def frame(self):
         return self.animation.frames[self.frame_index]
 
+    @property
+    def position(self):
+        """Reflect at safe screen edges, retaining motion across frame repeats."""
+        if self.animation.speed == 0:
+            return ANCHOR_X, False
+        frames = self.animation.frames
+        left = MOTION_MARGIN + max(f.anchor_x * DISPLAY_SCALE for f in frames)
+        right = WINDOW_WIDTH - MOTION_MARGIN - max(
+            (f.width - f.anchor_x) * DISPLAY_SCALE for f in frames)
+        span = right - left
+        phase = (ANCHOR_X - left + self.animation.speed * self.motion_elapsed) % (2 * span)
+        reflected = phase > span
+        return left + (2 * span - phase if reflected else phase), reflected
+
     def next_animation(self):
         self.animation_index = (self.animation_index + 1) % len(self.animations)
         self.frame_index = 0
@@ -122,6 +144,7 @@ class Playback:
         self.frame_elapsed = 0.0
         self.wait_elapsed = 0.0
         self.state = 'PLAYING'
+        self.motion_elapsed = 0.0
 
     def update(self, elapsed):
         if not isfinite(elapsed) or elapsed < 0:
@@ -131,6 +154,9 @@ class Playback:
             if self.wait_finished:
                 self.next_animation()
             return
+        remaining = ((REPEAT_COUNT - self.completed_repeats) * len(self.animation.frames)
+                     - self.frame_index) / self.animation.fps - self.frame_elapsed
+        self.motion_elapsed += min(elapsed, max(0.0, remaining))
         self.frame_elapsed += elapsed
         duration = 1.0 / self.animation.fps
         while self.frame_elapsed + 1e-12 >= duration:
@@ -154,6 +180,8 @@ def validate_animations(animations, image_width, image_height):
         if not animation.name or animation.name in names:
             raise ValueError(f'Invalid or duplicate animation name: {animation.name}')
         names.add(animation.name)
+        if not isfinite(animation.speed):
+            raise ValueError(f'{animation.name}: movement speed must be finite')
         if not isfinite(animation.fps) or animation.fps <= 0:
             raise ValueError(f'{animation.name}: fps must be positive and finite')
         if not animation.frames:
@@ -196,16 +224,21 @@ def clip_rectangle(frame, image_height):
     return frame.x, image_height - frame.y - frame.height, frame.width, frame.height
 
 
-def destination(frame):
+def destination(frame, anchor_x=ANCHOR_X, flipped=False):
     width, height = frame.width * DISPLAY_SCALE, frame.height * DISPLAY_SCALE
-    x = ANCHOR_X + (frame.width / 2 - frame.anchor_x) * DISPLAY_SCALE
+    offset = (frame.width / 2 - frame.anchor_x) * DISPLAY_SCALE
+    x = anchor_x + (-offset if flipped else offset)
     y = ANCHOR_Y + (frame.anchor_y - frame.height / 2) * DISPLAY_SCALE
     return x, y, width, height
 
 
-def draw_frame(sprite, frame):
+def draw_frame(sprite, frame, anchor_x=ANCHOR_X, flipped=False):
     p2d.clear_canvas()
-    sprite.clip_draw(*clip_rectangle(frame, sprite.h), *destination(frame))
+    if flipped:
+        sprite.clip_composite_draw(*clip_rectangle(frame, sprite.h), 0, 'h',
+                                   *destination(frame, anchor_x, flipped))
+    else:
+        sprite.clip_draw(*clip_rectangle(frame, sprite.h), *destination(frame, anchor_x))
     p2d.update_canvas()
 
 
@@ -223,7 +256,7 @@ def main():
             current_time = perf_counter()
             playback.update(current_time - previous_time)
             previous_time = current_time
-            draw_frame(sprite, playback.frame)
+            draw_frame(sprite, playback.frame, *playback.position)
             p2d.delay(0.01)
     except (OSError, ValueError) as error:
         print(f'Animation viewer: {error}', file=sys.stderr)
