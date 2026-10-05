@@ -56,9 +56,9 @@ def frames_from_boxes(boxes):
 
 # Measured from the 399x525 RGBA source. No uniform grid assumption.
 FRAME_ROWS = (
-    ((1,39,29,39), (31,40,26,38), (58,39,29,39), (87,40,29,38),
-     (118,40,30,38), (150,40,30,38), (182,40,32,38), (214,39,28,38),
-     (242,39,27,38), (270,45,24,32), (302,51,29,26)),
+    ((1,39,29,39), (31,40,26,38), (58,39,28,39), (86,40,30,38),
+     (118,40,30,38), (150,40,30,38), (182,40,29,38), (211,39,29,38),
+     (240,39,29,38), (270,45,24,32), (302,51,29,26)),
     ((8,80,26,37), (37,80,27,37), (65,80,31,38), (97,80,37,37),
      (135,80,32,35), (170,79,32,38), (206,79,26,38), (238,80,24,37),
      (263,80,30,37), (295,80,36,37), (334,80,32,36), (370,79,29,38)),
@@ -212,7 +212,9 @@ def draw_frame(sprite, frame):
 def main():
     """Application entry point."""
     p2d.open_canvas(WINDOW_WIDTH, WINDOW_HEIGHT)
+    sprite = None
     try:
+        p2d.hide_lattice()
         sprite = load_sprite()
         validate_animations(ANIMATIONS, sprite.w, sprite.h)
         playback = Playback(ANIMATIONS)
@@ -227,6 +229,8 @@ def main():
         print(f'Animation viewer: {error}', file=sys.stderr)
         return 1
     finally:
+        # Release the texture while its renderer still exists.
+        sprite = None
         p2d.close_canvas()
     return 0
 
