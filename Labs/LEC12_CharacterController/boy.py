@@ -24,9 +24,11 @@ class AutoRun(State):
         self.direction = self.boy.face_dir
         self.boy.face_dir = self.direction
         self.boy.scale = self.scale
+        self.boy.invincible = True
 
     def exit_state(self):
         self.boy.scale = 1.0
+        self.boy.invincible = False
 
     def update(self, dt):
         self.elapsed += dt
@@ -49,6 +51,7 @@ class Boy:
         self.frame = 0
         self.face_dir = 1
         self.scale = 1.0
+        self.invincible = False
         self.image = load_image('animation_sheet.png')
         self.screen_width = get_canvas_width()
         self.idle_time = 0.0
@@ -147,9 +150,15 @@ class Boy:
         elif event.type == SDL_KEYUP:
             if event.key == SDLK_LEFT:
                 self.left_pressed = False
+                if self.right_pressed:
+                    self.run_dir = 1
             elif event.key == SDLK_RIGHT:
                 self.right_pressed = False
-            if self.state == 'RUN' and not (self.left_pressed or self.right_pressed):
+                if self.left_pressed:
+                    self.run_dir = -1
+            if not (self.left_pressed or self.right_pressed):
+                self.run_dir = 0
+            if self.state == 'RUN' and self.run_dir == 0:
                 self.stop_run()
 
     def draw(self):
