@@ -3,7 +3,32 @@ from pico2d import (
     load_image, get_canvas_width,
     SDL_KEYDOWN, SDL_KEYUP, SDLK_LEFT, SDLK_RIGHT, SDLK_SPACE,
 )
-from transitions import Machine
+from transitions import Machine, State
+
+
+class AutoRun(State):
+    def __init__(self, boy):
+        self.boy = boy
+        self.elapsed = 0.0
+        self.direction = 1
+        self.speed = 250.0
+        self.scale = 1.0
+        super().__init__(
+            name='AUTO_RUN',
+            on_enter=self.enter_state,
+            on_exit=self.exit_state,
+        )
+
+    def enter_state(self):
+        self.elapsed = 0.0
+        self.direction = self.boy.face_dir
+        self.boy.face_dir = self.direction
+
+    def exit_state(self):
+        pass
+
+    def update(self, dt):
+        return False
 
 
 class Boy:
@@ -20,9 +45,10 @@ class Boy:
         self.run_dir = 0
         self.left_pressed = False
         self.right_pressed = False
+        self.auto_run = AutoRun(self)
         self.machine = Machine(
             model=self,
-            states=['IDLE', 'SLEEP', 'RUN'],
+            states=['IDLE', 'SLEEP', 'RUN', self.auto_run],
             initial='IDLE',
             auto_transitions=False,
             transitions=[
