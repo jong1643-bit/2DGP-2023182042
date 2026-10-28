@@ -167,5 +167,7 @@ class Boy:
         else:
             row = 300 if self.face_dir == 1 else 200
         size = 100 * self.scale
+        foot_y = self.y - 48
+        draw_y = foot_y + size / 2
         self.image.clip_draw(self.frame * 100, row, 100, 100,
-                             self.x, self.y, size, size)
+                             self.x, draw_y, size, size)
