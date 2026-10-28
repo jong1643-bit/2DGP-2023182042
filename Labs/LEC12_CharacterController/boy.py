@@ -28,6 +28,17 @@ class AutoRun(State):
         pass
 
     def update(self, dt):
+        self.elapsed += dt
+        self.boy.x += self.direction * self.speed * dt
+        half = 50 * self.scale
+        if self.boy.x <= half:
+            self.boy.x = half
+            self.direction = 1
+        elif self.boy.x >= self.boy.screen_width - half:
+            self.boy.x = self.boy.screen_width - half
+            self.direction = -1
+        self.boy.face_dir = self.direction
+        self.boy.frame = (self.boy.frame + 1) % 8
         return False
 
 
@@ -79,6 +90,8 @@ class Boy:
                 self.tick()
         elif self.state == 'RUN':
             self.update_run(dt)
+        elif self.state == 'AUTO_RUN':
+            self.auto_run.update(dt)
 
     def animate_idle(self):
         # Advance the idle animation without leaving the IDLE state.
@@ -130,7 +143,7 @@ class Boy:
                 self.stop_run()
 
     def draw(self):
-        if self.state == 'RUN':
+        if self.state in ('RUN', 'AUTO_RUN'):
             row = 100 if self.face_dir == 1 else 0
         else:
             row = 300 if self.face_dir == 1 else 200
