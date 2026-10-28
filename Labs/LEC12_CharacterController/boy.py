@@ -12,7 +12,7 @@ class AutoRun(State):
         self.elapsed = 0.0
         self.direction = 1
         self.speed = 500.0
-        self.scale = 1.0
+        self.scale = 1.8
         super().__init__(
             name='AUTO_RUN',
             on_enter=self.enter_state,
@@ -23,9 +23,10 @@ class AutoRun(State):
         self.elapsed = 0.0
         self.direction = self.boy.face_dir
         self.boy.face_dir = self.direction
+        self.boy.scale = self.scale
 
     def exit_state(self):
-        pass
+        self.boy.scale = 1.0
 
     def update(self, dt):
         self.elapsed += dt
@@ -147,4 +148,6 @@ class Boy:
             row = 100 if self.face_dir == 1 else 0
         else:
             row = 300 if self.face_dir == 1 else 200
-        self.image.clip_draw(self.frame * 100, row, 100, 100, self.x, self.y)
+        size = 100 * self.scale
+        self.image.clip_draw(self.frame * 100, row, 100, 100,
+                             self.x, self.y, size, size)
