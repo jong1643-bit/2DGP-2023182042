@@ -78,6 +78,8 @@ class Boy:
                      dest='AUTO_RUN'),
                 dict(trigger='stop_auto_run', source='AUTO_RUN',
                      dest='IDLE', after='enter_idle'),
+                dict(trigger='cancel_auto_run', source='AUTO_RUN',
+                     dest='RUN', after='enter_run'),
             ],
         )
 
@@ -131,11 +133,15 @@ class Boy:
                 self.run_dir = -1
                 if self.state == 'IDLE':
                     self.start_run()
+                elif self.state == 'AUTO_RUN':
+                    self.cancel_auto_run()
             elif event.key == SDLK_RIGHT:
                 self.right_pressed = True
                 self.run_dir = 1
                 if self.state == 'IDLE':
                     self.start_run()
+                elif self.state == 'AUTO_RUN':
+                    self.cancel_auto_run()
             elif event.key == SDLK_SPACE and self.state == 'SLEEP':
                 self.wake_up()
         elif event.type == SDL_KEYUP:
