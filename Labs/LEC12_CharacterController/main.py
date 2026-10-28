@@ -1,8 +1,11 @@
 from pico2d import *
+import os
 import random
 
 from boy import Boy  #boy: 모듈이름, Boy: 클래스 이름
 from grass import Grass  #grass: 모듈이름, Grass: 클래스 이름
+
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 # Game object class here
 
