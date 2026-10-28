@@ -40,7 +40,7 @@ class AutoRun(State):
             self.direction = -1
         self.boy.face_dir = self.direction
         self.boy.frame = (self.boy.frame + 1) % 8
-        return False
+        return self.elapsed >= 5.0
 
 
 class Boy:
@@ -76,6 +76,8 @@ class Boy:
                      after='enter_idle'),
                 dict(trigger='start_auto_run', source='IDLE',
                      dest='AUTO_RUN'),
+                dict(trigger='stop_auto_run', source='AUTO_RUN',
+                     dest='IDLE', after='enter_idle'),
             ],
         )
 
@@ -92,7 +94,8 @@ class Boy:
         elif self.state == 'RUN':
             self.update_run(dt)
         elif self.state == 'AUTO_RUN':
-            self.auto_run.update(dt)
+            if self.auto_run.update(dt):
+                self.stop_auto_run()
 
     def animate_idle(self):
         # Advance the idle animation without leaving the IDLE state.
