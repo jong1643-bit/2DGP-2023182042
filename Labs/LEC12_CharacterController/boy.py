@@ -1,7 +1,7 @@
 import time
 from pico2d import (
     load_image, get_canvas_width,
-    SDL_KEYDOWN, SDL_KEYUP, SDLK_LEFT, SDLK_RIGHT, SDLK_SPACE,
+    SDL_KEYDOWN, SDL_KEYUP, SDLK_a, SDLK_LEFT, SDLK_RIGHT, SDLK_SPACE,
 )
 from transitions import Machine, State
 
@@ -62,6 +62,8 @@ class Boy:
                      after='enter_run'),
                 dict(trigger='stop_run', source='RUN', dest='IDLE',
                      after='enter_idle'),
+                dict(trigger='start_auto_run', source='IDLE',
+                     dest='AUTO_RUN'),
             ],
         )
 
@@ -105,7 +107,9 @@ class Boy:
 
     def handle_event(self, event):
         if event.type == SDL_KEYDOWN:
-            if event.key == SDLK_LEFT:
+            if event.key == SDLK_a and self.state == 'IDLE':
+                self.start_auto_run()
+            elif event.key == SDLK_LEFT:
                 self.left_pressed = True
                 self.run_dir = -1
                 if self.state == 'IDLE':
