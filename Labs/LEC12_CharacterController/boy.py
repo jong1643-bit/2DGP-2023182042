@@ -11,7 +11,7 @@ class AutoRun(State):
         self.boy = boy
         self.elapsed = 0.0
         self.direction = 1
-        self.speed = 250.0
+        self.speed = 500.0
         self.scale = 1.0
         super().__init__(
             name='AUTO_RUN',
