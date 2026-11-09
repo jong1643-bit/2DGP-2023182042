@@ -5,6 +5,8 @@ import title_mode
 from boy import Boy
 from grass import Grass
 
+ball_size = 1
+
 
 def handle_events():
     event_list = get_events()
@@ -24,7 +26,7 @@ def init():
     global boy
 
 
-    boy = Boy()
+    boy = Boy(ball_size)
     game_world.add_oject(boy)
 
     grass = Grass()
@@ -43,6 +45,5 @@ def render():
 
 def finish():
     game_world.clear()
-
 
 

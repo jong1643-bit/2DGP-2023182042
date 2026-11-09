@@ -10,8 +10,12 @@ from ball import Ball
 
 
 class Boy:
-    def __init__(self):
+    def __init__(self, ball_size=1):
+        if ball_size not in (0, 1, 2):
+            raise ValueError('ball_size must be 0, 1, or 2')
+
         self.x, self.y = 400, 90
+        self.ball_size = ball_size
         self.frame = 0
         self.image = load_image('animation_sheet.png')
         self.idle_started_at = get_time()
@@ -47,7 +51,10 @@ class Boy:
         self.frame = 0
 
     def fire_ball(self):
-        ball = Ball(self.x, self.y, self.face_dir * 10)
+        if self.ball_size == 0:
+            return
+
+        ball = Ball(self.x, self.y, self.face_dir * 10, self.ball_size)
         game_world.add_oject(ball)
 
     def handle_event(self, event):
