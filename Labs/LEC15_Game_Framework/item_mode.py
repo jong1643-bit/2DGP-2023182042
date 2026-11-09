@@ -1,6 +1,5 @@
 from pico2d import *
 import game_framework
-import title_mode
 
 image = None
 
@@ -30,11 +29,13 @@ def handle_events():
         if event.type == SDL_QUIT:
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
-            game_framework.change_mode(title_mode)
+            game_framework.pop_mode()
             return
         elif event.type == SDL_KEYDOWN and event.key in (SDLK_0, SDLK_1, SDLK_2):
             import play_mode
 
-            play_mode.ball_size = event.key - SDLK_0
-            game_framework.change_mode(play_mode)
+            selected_size = event.key - SDLK_0
+            play_mode.ball_size = selected_size
+            play_mode.boy.ball_size = selected_size
+            game_framework.pop_mode()
             return

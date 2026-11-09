@@ -1,9 +1,11 @@
 from pico2d import *
 import game_world
 import game_framework
+import item_mode
 import title_mode
 from boy import Boy
 from grass import Grass
+from pico2d import SDLK_i
 
 ball_size = 1
 
@@ -16,6 +18,9 @@ def handle_events():
             return
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.change_mode(title_mode)
+            return
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_i:
+            game_framework.push_mode(item_mode)
             return
         else:
             boy.handle_event(event)
@@ -46,4 +51,11 @@ def render():
 def finish():
     game_world.clear()
 
+
+def pause():
+    pass
+
+
+def resume():
+    pass
 
